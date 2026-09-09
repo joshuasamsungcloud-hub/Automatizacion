@@ -1237,7 +1237,90 @@
       grid.innerHTML = html;
     }
 
-    function changeDCSPage(delta) {
+    
+    function renderDCS() {
+      const grid = document.getElementById('gridDCS');
+      if (!grid) return;
+
+      let data = BAILEY_TAGS;
+
+      if (selectedPCU !== 'all') {
+        data = data.filter(item => item[5] === selectedPCU);
+      }
+
+      if (filterQuery) {
+        data = data.filter(item => {
+          const tag = String(item[0]).toLowerCase();
+          const desc = String(item[1]).toLowerCase();
+          const fc = String(item[2]).toLowerCase();
+          const blk = String(item[3]);
+          const cld = String(item[4]).toLowerCase();
+          return tag.includes(filterQuery) || desc.includes(filterQuery) || fc.includes(filterQuery) || blk.includes(filterQuery) || cld.includes(filterQuery);
+        });
+      }
+
+      const total = data.length;
+      const totalPages = Math.ceil(total / PAGE_LIMIT) || 1;
+      if (dcsPage > totalPages) dcsPage = totalPages;
+      if (dcsPage < 1) dcsPage = 1;
+
+      const start = (dcsPage - 1) * PAGE_LIMIT;
+      const end = Math.min(start + PAGE_LIMIT, total);
+      const pageSlice = data.slice(start, end);
+
+      const indicator = document.getElementById('dcsPageIndicator');
+      if (indicator) {
+        indicator.innerText = `Mostrando ${total === 0 ? 0 : start + 1} - ${end} de ${total.toLocaleString()} Tags DCS`;
+      }
+      const prevBtn = document.getElementById('btnPrevDCS');
+      if (prevBtn) prevBtn.disabled = dcsPage <= 1;
+      const nextBtn = document.getElementById('btnNextDCS');
+      if (nextBtn) nextBtn.disabled = dcsPage >= totalPages;
+
+      if (total === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p>No se encontraron registros que coincidan con la búsqueda.</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      pageSlice.forEach(item => {
+        const [tagName, tagDesc, fcDesc, block, cld, pcu, controller] = item;
+        html += `
+          <div class="clean-card">
+            <div class="card-top-row">
+              <div class="tag-title-wrap">
+                <span class="tag-title" title="${tagName}">${tagName}</span>
+                <button class="btn-action-sm" title="Copiar TAG" onclick="copyToClipboard('${tagName}', 'TAG')">📋</button>
+              </div>
+              <span class="badge-gray">PCU ${pcu} • C${controller}</span>
+            </div>
+            <div class="card-description">${tagDesc || '<span style="color:var(--text-dim);">Sin descripción de servicio</span>'}</div>
+            <div class="specs-grid">
+              <div class="spec-cell">
+                <span class="spec-key">Bloque</span>
+                <span class="spec-val bold">B-${block}</span>
+              </div>
+              <div class="spec-cell">
+                <span class="spec-key">Tipo FC</span>
+                <span class="spec-val" title="${fcDesc}">${fcDesc || 'N/A'}</span>
+              </div>
+              <div class="spec-cell">
+                <span class="spec-key">Lógica CLD</span>
+                <span class="spec-val" title="${cld}">${cld || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+    }
+
+function changeDCSPage(delta) {
       dcsPage += delta;
       renderDCS();
       window.scrollTo({ top: 110, behavior: 'smooth' });
