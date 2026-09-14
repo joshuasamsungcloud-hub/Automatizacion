@@ -42,6 +42,7 @@
       --radius-lg: 14px;
       --radius-xl: 18px;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-sans); }
     body {
       background-color: var(--bg-base);
@@ -93,15 +94,6 @@
       font-size: 1.3rem;
       box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35);
       position: relative;
-    }
-     .segmented-control {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr); /* Cambiado a 4 columnas */
-      gap: 6px;
-      background: #080d17;
-      padding: 4px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-subtle);
     }
     .status-dot {
       width: 9px;
@@ -781,27 +773,16 @@
           6,184 Tags
         </div>
       </div>
-     <!-- Segmented Navigation (4 Major Sessions) -->
+
+      <!-- Segmented Navigation (2 Major Sessions) -->
       <div class="segmented-control">
         <button class="segment-btn active" id="seg-abb" onclick="switchSession('abb')">
-          <span class="icon-accent">🎛️</span> DCS Bailey
-        </button>
-        <button class="segment-btn" id="seg-plc" onclick="switchSession('plc')">
-          <span class="icon-accent">⚡</span> PLC Máquina
-        </button>
-        <button class="segment-btn" id="seg-conv" onclick="switchSession('conv')">
-          <span class="icon-accent">📦</span> Conversión
+          <span class="icon-accent">🎛️</span> ABB Bailey DCS
         </button>
         <button class="segment-btn" id="seg-passwords" onclick="switchSession('passwords')">
-          <span class="icon-accent">🔒</span> Claves & Red
+          <span class="icon-accent">🔒</span> Claves & Red OT
         </button>
       </div>
-
-      <!-- Sub-Pills for PLC Máquina -->
-      <div class="subnav-pills" id="subnavPLC" style="display: none;"></div>
-
-      <!-- Sub-Pills for Conversión -->
-      <div class="subnav-pills" id="subnavConv" style="display: none;"></div>
 
       <!-- Sub-Pills for Passwords Section -->
       <div class="subnav-pills" id="subnavPasswords" style="display: none;">
