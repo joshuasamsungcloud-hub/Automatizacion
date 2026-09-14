@@ -943,29 +943,43 @@
     const PAGE_LIMIT = 48;
 
     let enteredPin = '';
+let currentConvTab = '';
+    let convPage = 1;
 
-    // Switch between ABB DCS and Passwords
-    function switchSession(sess) {
-      activeMain = sess;
-      document.getElementById('seg-abb').classList.toggle('active', sess === 'abb');
-      document.getElementById('seg-passwords').classList.toggle('active', sess === 'passwords');
+    function switchSession(session) {
+      currentSession = session;
+      document.querySelectorAll('.segmented-control button').forEach(b => b.classList.remove('active'));
+      document.getElementById('seg-' + session).classList.add('active');
 
-      const viewDCS = document.getElementById('viewDCS');
-      const viewPasswords = document.getElementById('viewPasswords');
-      const dcsFilterBar = document.getElementById('dcsFilterBar');
-      const subnavPasswords = document.getElementById('subnavPasswords');
-      const navSubtext = document.getElementById('navSubtext');
-      const counterPill = document.getElementById('counterPill');
+      document.getElementById('viewDCS').style.display = session === 'abb' ? 'block' : 'none';
+      document.getElementById('viewPLC').style.display = session === 'plc' ? 'block' : 'none';
+      document.getElementById('viewConv').style.display = session === 'conv' ? 'block' : 'none';
+      document.getElementById('viewPasswords').style.display = session === 'passwords' ? 'block' : 'none';
 
-      if (sess === 'abb') {
-        viewDCS.style.display = 'block';
-        viewPasswords.style.display = 'none';
-        dcsFilterBar.style.display = 'flex';
-        subnavPasswords.style.display = 'none';
-        navSubtext.innerText = 'Symphony Plus Harmony DCS • Coordinación OT';
-        counterPill.innerText = `${BAILEY_TAGS.length.toLocaleString()} Tags`;
-        renderDCS();
+      document.getElementById('dcsFilterBar').style.display = session === 'abb' ? 'flex' : 'none';
+      document.getElementById('subnavPLC').style.display = session === 'plc' ? 'flex' : 'none';
+      document.getElementById('subnavConv').style.display = session === 'conv' ? 'flex' : 'none';
+      document.getElementById('subnavPasswords').style.display = session === 'passwords' ? 'flex' : 'none';
+
+      const searchInput = document.getElementById('globalSearch');
+      if (session === 'abb') {
+        searchInput.placeholder = "Buscar por TAG, dirección, bloque o descripción (DCS Bailey)...";
+        document.getElementById('navSubtext').textContent = "Symphony Plus Harmony DCS • Señales & Redes";
+      } else if (session === 'plc') {
+        searchInput.placeholder = "Buscar señales, racks o equipos E/S PLC Máquina...";
+        document.getElementById('navSubtext').textContent = "Controladores S7 / TIA Portal V13 • Máquina";
+      } else if (session === 'conv') {
+        searchInput.placeholder = "Buscar señales, racks o equipos E/S Conversión...";
+        document.getElementById('navSubtext').textContent = "Área de Conversión • Embaladora, Pasaban, Jagenberg";
       } else {
+        searchInput.placeholder = "Buscar sistemas, IPs, usuarios o contraseñas...";
+        document.getElementById('navSubtext').textContent = "Bóveda de Credenciales • OT & Redes Industriales";
+      }
+
+      searchInput.value = '';
+      document.getElementById('btnClearSearch').style.display = 'none';
+      renderCurrentView(); // Refrescará la vista activa
+    } else {
         viewDCS.style.display = 'none';
         viewPasswords.style.display = 'block';
         dcsFilterBar.style.display = 'none';
