@@ -961,7 +961,39 @@
         })
         .then(data => {
           PLC_DATA = data;
+          // --- INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCurrentView(); // Muestra DCS por defecto
+      
+      // Conectar automáticamente con el archivo JSON en GitHub
+      fetch('datos_plc.json')
+        .then(response => {
+          if (!response.ok) throw new Error("Archivo no encontrado");
+          return response.json();
+        })
+        .then(data => {
+          PLC_DATA = data;
           
+          // --- NUEVO: ACTUALIZAR EL CONTADOR TOTAL DE TAGS ---
+          let totalTags = BAILEY_TAGS.length; // Empieza con los 6,184 del DCS
+          
+          // Suma todos los tags de PLC Máquina
+          Object.values(PLC_DATA.maquina || {}).forEach(equipo => {
+            totalTags += equipo.length;
+          });
+          
+          // Suma todos los tags de Conversión
+          Object.values(PLC_DATA.conversion || {}).forEach(equipo => {
+            totalTags += equipo.length;
+          });
+          
+          // Muestra el número con formato (ej. 32,540 Tags)
+          const counter = document.getElementById('counterPill');
+          if (counter) counter.textContent = totalTags.toLocaleString() + " Tags";
+          // --------------------------------------------------
+
+          // Seleccionar primer equipo por defecto si existe
+          const maqKeys = Object.keys(PLC_DATA.maquina || {});
           // Asignar los primeros equipos a la barra secundaria
           const maqKeys = Object.keys(PLC_DATA.maquina || {});
           if (maqKeys.length > 0) currentPLCTab = maqKeys[0];
