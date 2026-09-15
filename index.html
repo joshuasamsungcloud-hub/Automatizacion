@@ -1134,11 +1134,31 @@
       renderGenericGrid(grid, PLC_DATA.conversion[currentConvTab], 'conv');
     }
 
-    function renderGenericGrid(container, items, type) {
-      const searchVal = document.getElementById('globalSearch').value.toLowerCase();
+   function renderGenericGrid(container, items, type) {
+      const searchInput = document.getElementById('globalSearch');
+      const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+      
+      // Creamos una versión de la búsqueda sin ningún espacio para encontrar direcciones como "E      39.4"
+      const searchNoSpaces = searchVal.replace(/\s+/g, '');
+      
       let filtered = items;
       if (searchVal) {
-        filtered = items.filter(i => i[0].toLowerCase().includes(searchVal) || i[3].toLowerCase().includes(searchVal) || i[1].toLowerCase().includes(searchVal));
+        filtered = items.filter(i => {
+          // Detectamos automáticamente si las columnas están desordenadas en el JSON
+          const isOldFormat = (i[2] !== "BOOL" && i[2] !== "REAL" && i[2] !== "INT" && i[2] !== "WORD" && i[2] !== "DI" && i[2] !== "DO");
+          
+          const tagStr = String(isOldFormat ? i[1] : i[0]).toLowerCase();
+          const addrStr = String(isOldFormat ? i[0] : i[1]).toLowerCase();
+          const descStr = String(isOldFormat ? i[2] : i[3]).toLowerCase();
+          
+          // Comparamos sin espacios para que "E39.4" coincida con "E      39.4"
+          const tagNoSpaces = tagStr.replace(/\s+/g, '');
+          const addrNoSpaces = addrStr.replace(/\s+/g, '');
+
+          return tagNoSpaces.includes(searchNoSpaces) || 
+                 addrNoSpaces.includes(searchNoSpaces) || 
+                 descStr.includes(searchVal);
+        });
       }
 
       let page = type === 'plc' ? plcPage : convPage;
@@ -1151,25 +1171,41 @@
       const paginated = filtered.slice(start, start + pageSize);
 
       if (type === 'plc') {
-        document.getElementById('plcPageIndicator').textContent = `Página ${page} de ${totalPages} (${filtered.length} señales)`;
-        document.getElementById('btnPrevPLC').disabled = (page <= 1);
-        document.getElementById('btnNextPLC').disabled = (page >= totalPages);
+        const ind = document.getElementById('plcPageIndicator');
+        if(ind) ind.textContent = `Página ${page} de ${totalPages} (${filtered.length} señales)`;
+        const bPrev = document.getElementById('btnPrevPLC');
+        if(bPrev) bPrev.disabled = (page <= 1);
+        const bNext = document.getElementById('btnNextPLC');
+        if(bNext) bNext.disabled = (page >= totalPages);
       } else {
-        document.getElementById('convPageIndicator').textContent = `Página ${page} de ${totalPages} (${filtered.length} señales)`;
-        document.getElementById('btnPrevConv').disabled = (page <= 1);
-        document.getElementById('btnNextConv').disabled = (page >= totalPages);
+        const ind = document.getElementById('convPageIndicator');
+        if(ind) ind.textContent = `Página ${page} de ${totalPages} (${filtered.length} señales)`;
+        const bPrev = document.getElementById('btnPrevConv');
+        if(bPrev) bPrev.disabled = (page <= 1);
+        const bNext = document.getElementById('btnNextConv');
+        if(bNext) bNext.disabled = (page >= totalPages);
       }
 
       if (paginated.length === 0) {
-        container.innerHTML = '<div class="empty-state">No se encontraron señales con esa búsqueda.</div>';
+        container.innerHTML = '<div class="empty-state"><p>No se encontraron señales con esa búsqueda.</p></div>';
         return;
       }
 
       container.innerHTML = paginated.map(item => {
-        const tag = item[0] || 'TAG_VACIO';
-        const address = item[1] || 'N/A';
-        const dataType = item[2] || 'BOOL';
-        const desc = item[3] || 'Sin descripción';
+        // Ordenamos las variables según el formato detectado
+        const isOldFormat = (item[2] !== "BOOL" && item[2] !== "REAL" && item[2] !== "INT" && item[2] !== "WORD" && item[2] !== "DI" && item[2] !== "DO");
+        
+        let address = isOldFormat ? item[0] : item[1];
+        let tag = isOldFormat ? item[1] : item[0];
+        let desc = isOldFormat ? item[2] : item[3];
+        let dataType = isOldFormat ? 'BOOL' : item[2];
+
+        if (!tag || tag.trim() === '') tag = 'Sin TAG';
+        if (!address || address.trim() === '') address = 'N/A';
+        if (!desc || desc.trim() === '') desc = 'Sin descripción';
+        
+        // Limpiamos los espacios gigantes de TIA Portal para que la tarjeta se vea estética
+        address = address.replace(/\s+/g, ' ').trim();
 
         return `
         <div class="dcs-card type-msdd">
@@ -1183,14 +1219,13 @@
           <div class="tag-description">${desc}</div>
           <div class="dcs-specs">
             <div class="spec-item"><span class="spec-label">Dirección</span><span class="spec-val hl">${address}</span></div>
-            <div class="spec-item"><span class="spec-label">PLC</span><span class="spec-val">S7-300</span></div>
-            <div class="spec-item"><span class="spec-label">Sistema</span><span class="spec-val hl">TIA V13</span></div>
+            <div class="spec-item"><span class="spec-label">PLC</span><span class="spec-val">S7-300 / 400</span></div>
+            <div class="spec-item"><span class="spec-label">Sistema</span><span class="spec-val hl">Siemens TIA</span></div>
           </div>
         </div>
         `;
       }).join('');
     }
-
     function renderPasswordsView() {
       const lockCard = document.getElementById('lockCard');
       const unlockedPanel = document.getElementById('unlockedPanel');
