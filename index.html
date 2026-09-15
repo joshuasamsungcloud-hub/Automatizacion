@@ -937,357 +937,406 @@
     let currentPageIdx = 1;
     const PAGE_LIMIT = 48;
 
-    let enteredPin = '';
-let currentConvTab = '';
-    let convPage = 1;
+// --- VARIABLES DE ESTADO ---
+    let currentSession = 'abb';
+    let currentPCUFilter = 'all';
+    let pinBuffer = [];
+    const correctPIN = ['1', '2', '3'];
+    let vaultUnlocked = false;
+    let currentPassSub = 'papelera';
 
+    // Paginación
+    let dcsPage = 1;
+    let plcPage = 1;
+    let convPage = 1;
+    const pageSize = 18;
+
+    // Base de Datos Externa
+    let PLC_DATA = { maquina: {}, conversion: {} };
+    let currentPLCTab = '';
+    let currentConvTab = '';
+
+    // --- INITIALIZATION (LEE EL ARCHIVO EXTERNO) ---
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCurrentView(); // Muestra DCS por defecto
+      
+      // Magia: Cargar el archivo de 4.7MB automáticamente desde GitHub
+      fetch('datos_plc.json')
+        .then(response => {
+          if (!response.ok) throw new Error("No se pudo cargar el archivo");
+          return response.json();
+        })
+        .then(data => {
+          PLC_DATA = data;
+          
+          // Asignar los primeros equipos a la barra secundaria
+          const maqKeys = Object.keys(PLC_DATA.maquina || {});
+          if (maqKeys.length > 0) currentPLCTab = maqKeys[0];
+
+          const convKeys = Object.keys(PLC_DATA.conversion || {});
+          if (convKeys.length > 0) currentConvTab = convKeys[0];
+
+          buildSubnavs();
+          showToast("Base de datos Máquina/Conversión conectada ✓");
+        })
+        .catch(err => {
+          console.warn("Sube el archivo datos_plc.json a GitHub junto al index.html");
+        });
+    });
+
+    // --- NAVIGATION & ROUTING ---
     function switchSession(session) {
       currentSession = session;
       document.querySelectorAll('.segmented-control button').forEach(b => b.classList.remove('active'));
       document.getElementById('seg-' + session).classList.add('active');
 
-      document.getElementById('viewDCS').style.display = session === 'abb' ? 'block' : 'none';
-      document.getElementById('viewPLC').style.display = session === 'plc' ? 'block' : 'none';
-      document.getElementById('viewConv').style.display = session === 'conv' ? 'block' : 'none';
-      document.getElementById('viewPasswords').style.display = session === 'passwords' ? 'block' : 'none';
-
-      document.getElementById('dcsFilterBar').style.display = session === 'abb' ? 'flex' : 'none';
-      document.getElementById('subnavPLC').style.display = session === 'plc' ? 'flex' : 'none';
-      document.getElementById('subnavConv').style.display = session === 'conv' ? 'flex' : 'none';
-      document.getElementById('subnavPasswords').style.display = session === 'passwords' ? 'flex' : 'none';
+      ['viewDCS', 'viewPLC', 'viewConv', 'viewPasswords'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none';
+      });
+      ['dcsFilterBar', 'subnavPLC', 'subnavConv', 'subnavPasswords'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.display = 'none';
+      });
 
       const searchInput = document.getElementById('globalSearch');
+      
       if (session === 'abb') {
-        searchInput.placeholder = "Buscar por TAG, dirección, bloque o descripción (DCS Bailey)...";
+        document.getElementById('viewDCS').style.display = 'block';
+        document.getElementById('dcsFilterBar').style.display = 'flex';
+        searchInput.placeholder = "Buscar por TAG DCS...";
         document.getElementById('navSubtext').textContent = "Symphony Plus Harmony DCS • Señales & Redes";
       } else if (session === 'plc') {
-        searchInput.placeholder = "Buscar señales, racks o equipos E/S PLC Máquina...";
-        document.getElementById('navSubtext').textContent = "Controladores S7 / TIA Portal V13 • Máquina";
+        document.getElementById('viewPLC').style.display = 'block';
+        document.getElementById('subnavPLC').style.display = 'flex';
+        searchInput.placeholder = "Buscar señales E/S Máquina...";
+        document.getElementById('navSubtext').textContent = "Señales de TIA Portal V13 • Máquina Papelera";
       } else if (session === 'conv') {
-        searchInput.placeholder = "Buscar señales, racks o equipos E/S Conversión...";
+        document.getElementById('viewConv').style.display = 'block';
+        document.getElementById('subnavConv').style.display = 'flex';
+        searchInput.placeholder = "Buscar señales E/S Conversión...";
         document.getElementById('navSubtext').textContent = "Área de Conversión • Embaladora, Pasaban, Jagenberg";
-      } else {
-        searchInput.placeholder = "Buscar sistemas, IPs, usuarios o contraseñas...";
+      } else if (session === 'passwords') {
+        document.getElementById('viewPasswords').style.display = 'block';
+        document.getElementById('subnavPasswords').style.display = 'flex';
+        searchInput.placeholder = "Buscar IPs o credenciales...";
         document.getElementById('navSubtext').textContent = "Bóveda de Credenciales • OT & Redes Industriales";
       }
 
       searchInput.value = '';
       document.getElementById('btnClearSearch').style.display = 'none';
-      renderCurrentView(); // Refrescará la vista activa
-    } else {
-        viewDCS.style.display = 'none';
-        viewPasswords.style.display = 'block';
-        dcsFilterBar.style.display = 'none';
-        navSubtext.innerText = 'Servidores SCADA • PLCs • Credenciales de Acceso';
+      renderCurrentView();
+    }
 
-        if (isVaultUnlocked) {
-          document.getElementById('lockCard').style.display = 'none';
-          document.getElementById('unlockedPanel').style.display = 'block';
-          subnavPasswords.style.display = 'flex';
-          const totalSys = PASSWORDS_DATA.papelera.length + PASSWORDS_DATA.conversion.length;
-          counterPill.innerText = `${totalSys} Sistemas`;
-          renderPasswords();
-        } else {
-          document.getElementById('lockCard').style.display = 'block';
-          document.getElementById('unlockedPanel').style.display = 'none';
-          subnavPasswords.style.display = 'none';
-          counterPill.innerText = '🔒 Bloqueado';
-          clearPIN();
-        }
+    function buildSubnavs() {
+      // Submenú PLC Máquina
+      const subPLC = document.getElementById('subnavPLC');
+      if (subPLC) {
+        subPLC.innerHTML = '';
+        Object.keys(PLC_DATA.maquina || {}).forEach((eqName) => {
+          const count = PLC_DATA.maquina[eqName].length;
+          const btn = document.createElement('button');
+          btn.className = `sub-pill ${eqName === currentPLCTab ? 'active' : ''}`;
+          btn.innerHTML = `⚡ ${eqName} (${count})`;
+          btn.onclick = () => { currentPLCTab = eqName; plcPage = 1; buildSubnavs(); renderPLCView(); };
+          subPLC.appendChild(btn);
+        });
+      }
+
+      // Submenú Conversión
+      const subConv = document.getElementById('subnavConv');
+      if (subConv) {
+        subConv.innerHTML = '';
+        Object.keys(PLC_DATA.conversion || {}).forEach((eqName) => {
+          const count = PLC_DATA.conversion[eqName].length;
+          const btn = document.createElement('button');
+          btn.className = `sub-pill ${eqName === currentConvTab ? 'active' : ''}`;
+          btn.innerHTML = `📦 ${eqName} (${count})`;
+          btn.onclick = () => { currentConvTab = eqName; convPage = 1; buildSubnavs(); renderConvView(); };
+          subConv.appendChild(btn);
+        });
       }
     }
 
-    // PIN Pad logic
-    function pressDigit(d) {
-      if (enteredPin.length < 3) {
-        enteredPin += d;
-        updatePinDots();
-        if (enteredPin.length === 3) {
-          setTimeout(submitPIN, 120);
-        }
-      }
-    }
-
-    function clearPIN() {
-      enteredPin = '';
-      updatePinDots();
-      document.getElementById('pinError').innerText = '';
-    }
-
-    function updatePinDots() {
-      for (let i = 0; i < 3; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if (i < enteredPin.length) {
-          dot.classList.add('filled');
-        } else {
-          dot.classList.remove('filled');
-        }
-      }
-    }
-
-    function submitPIN() {
-      if (enteredPin === '123') {
-        isVaultUnlocked = true;
-        document.getElementById('lockCard').style.display = 'none';
-        document.getElementById('unlockedPanel').style.display = 'block';
-        document.getElementById('subnavPasswords').style.display = 'flex';
-        document.getElementById('pinError').innerText = '';
-        showToast('Bóveda de credenciales desbloqueada');
-        const totalSys = PASSWORDS_DATA.papelera.length + PASSWORDS_DATA.conversion.length;
-        document.getElementById('counterPill').innerText = `${totalSys} Sistemas`;
-        renderPasswords();
-      } else {
-        document.getElementById('pinError').innerText = 'PIN incorrecto. Intenta de nuevo.';
-        clearPIN();
-      }
-    }
-
-    function relockVault() {
-      isVaultUnlocked = false;
-      switchSession('passwords');
-      showToast('Bóveda bloqueada');
-    }
-
-    function switchPasswordSub(sub) {
-      currentPassSub = sub;
-      document.getElementById('pill-papelera').classList.toggle('active', sub === 'papelera');
-      document.getElementById('pill-conversion').classList.toggle('active', sub === 'conversion');
-      renderPasswords();
+    function switchPasswordSub(subKey) {
+      currentPassSub = subKey;
+      document.querySelectorAll('#subnavPasswords .sub-pill').forEach(p => p.classList.remove('active'));
+      document.getElementById('pill-' + subKey).classList.add('active');
+      renderPasswordsView();
     }
 
     function filterPCU(pcu) {
-      selectedPCU = pcu;
-      document.querySelectorAll('#dcsFilterBar .filter-chip').forEach(chip => {
-        if ((pcu === 'all' && chip.innerText.toLowerCase().includes('todas')) ||
-            chip.innerText === `PCU ${pcu}`) {
-          chip.classList.add('active');
-        } else {
-          chip.classList.remove('active');
-        }
-      });
-      currentPageIdx = 1;
-      renderDCS();
+      currentPCUFilter = pcu;
+      dcsPage = 1;
+      document.querySelectorAll('#dcsFilterBar .filter-chip').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      renderDCSView();
     }
 
-    function handleSearch() {
-      filterQuery = document.getElementById('globalSearch').value.trim().toLowerCase();
-      document.getElementById('btnClearSearch').style.display = filterQuery ? 'flex' : 'none';
-      currentPageIdx = 1;
-      if (activeMain === 'abb') {
-        renderDCS();
-      } else if (isVaultUnlocked) {
-        renderPasswords();
+    // --- RENDERING VIEWS ---
+    function renderCurrentView() {
+      if (currentSession === 'abb') renderDCSView();
+      else if (currentSession === 'plc') renderPLCView();
+      else if (currentSession === 'conv') renderConvView();
+      else renderPasswordsView();
+    }
+
+    function renderDCSView() {
+      const grid = document.getElementById('gridDCS');
+      const searchVal = document.getElementById('globalSearch').value.toLowerCase();
+      
+      let filtered = BAILEY_TAGS.filter(item => {
+        const matchPCU = (currentPCUFilter === 'all' || item[5] == currentPCUFilter);
+        const matchSearch = !searchVal || item[0].toLowerCase().includes(searchVal) || item[1].toLowerCase().includes(searchVal) || item[4].toLowerCase().includes(searchVal);
+        return matchPCU && matchSearch;
+      });
+
+      const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+      if (dcsPage > totalPages) dcsPage = totalPages;
+      const start = (dcsPage - 1) * pageSize;
+      const paginated = filtered.slice(start, start + pageSize);
+
+      document.getElementById('pageIndicator').textContent = `Página ${dcsPage} de ${totalPages} (${filtered.length} tags)`;
+      document.getElementById('btnPrevPage').disabled = (dcsPage <= 1);
+      document.getElementById('btnNextPage').disabled = (dcsPage >= totalPages);
+
+      if (paginated.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><p>No se encontraron tags DCS en esta PCU.</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = paginated.map(item => `
+        <div class="dcs-card type-digital">
+          <div class="card-row-top">
+            <div class="tag-title-wrap">
+              <span class="tag-title" title="${item[0]}">${item[0]}</span>
+              <button class="btn-copy-tag" onclick="copyText('${item[0]}')">Copiar</button>
+            </div>
+            <span class="badge-pill badge-digital">PCU ${item[5]}</span>
+          </div>
+          <div class="tag-description">${item[1] || '<span style="color:var(--text-dim)">Sin descripción registrada</span>'}</div>
+          <div class="dcs-specs">
+            <div class="spec-item"><span class="spec-label">Bloque</span><span class="spec-val">#${item[3]}</span></div>
+            <div class="spec-item"><span class="spec-label">Tipo I/O</span><span class="spec-val">${item[6]} Canal</span></div>
+            <div class="spec-item"><span class="spec-label">Módulo</span><span class="spec-val hl">${item[5]}</span></div>
+          </div>
+          <div class="cld-footer"><span>Rack:</span> <strong>${item[4]}</strong></div>
+        </div>
+      `).join('');
+    }
+
+    function renderPLCView() {
+      const grid = document.getElementById('gridPLC');
+      if (!PLC_DATA.maquina || !PLC_DATA.maquina[currentPLCTab]) {
+        grid.innerHTML = '<div class="empty-state">Sincronizando Base de Datos de GitHub...</div>';
+        return;
+      }
+      renderGenericGrid(grid, PLC_DATA.maquina[currentPLCTab], 'plc');
+    }
+
+    function renderConvView() {
+      const grid = document.getElementById('gridConv');
+      if (!PLC_DATA.conversion || !PLC_DATA.conversion[currentConvTab]) {
+        grid.innerHTML = '<div class="empty-state">Sincronizando Base de Datos de GitHub...</div>';
+        return;
+      }
+      renderGenericGrid(grid, PLC_DATA.conversion[currentConvTab], 'conv');
+    }
+
+    function renderGenericGrid(container, items, type) {
+      const searchVal = document.getElementById('globalSearch').value.toLowerCase();
+      let filtered = items;
+      if (searchVal) {
+        filtered = items.filter(i => i[0].toLowerCase().includes(searchVal) || i[3].toLowerCase().includes(searchVal) || i[1].toLowerCase().includes(searchVal));
+      }
+
+      let page = type === 'plc' ? plcPage : convPage;
+      const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+      if (page > totalPages) page = totalPages;
+      if (page < 1) page = 1;
+      if (type === 'plc') plcPage = page; else convPage = page;
+      
+      const start = (page - 1) * pageSize;
+      const paginated = filtered.slice(start, start + pageSize);
+
+      if (type === 'plc') {
+        document.getElementById('plcPageIndicator').textContent = `Página ${page} de ${totalPages} (${filtered.length} señales)`;
+        document.getElementById('btnPrevPLC').disabled = (page <= 1);
+        document.getElementById('btnNextPLC').disabled = (page >= totalPages);
+      } else {
+        document.getElementById('convPageIndicator').textContent = `Página ${page} de ${totalPages} (${filtered.length} señales)`;
+        document.getElementById('btnPrevConv').disabled = (page <= 1);
+        document.getElementById('btnNextConv').disabled = (page >= totalPages);
+      }
+
+      if (paginated.length === 0) {
+        container.innerHTML = '<div class="empty-state">No se encontraron señales con esa búsqueda.</div>';
+        return;
+      }
+
+      container.innerHTML = paginated.map(item => {
+        const tag = item[0] || 'TAG_VACIO';
+        const address = item[1] || 'N/A';
+        const dataType = item[2] || 'BOOL';
+        const desc = item[3] || 'Sin descripción';
+
+        return `
+        <div class="dcs-card type-msdd">
+          <div class="card-row-top">
+            <div class="tag-title-wrap">
+              <span class="tag-title" title="${tag}">${tag}</span>
+              <button class="btn-copy-tag" onclick="copyText('${tag}')">Copiar</button>
+            </div>
+            <span class="badge-pill badge-msdd">${dataType}</span>
+          </div>
+          <div class="tag-description">${desc}</div>
+          <div class="dcs-specs">
+            <div class="spec-item"><span class="spec-label">Dirección</span><span class="spec-val hl">${address}</span></div>
+            <div class="spec-item"><span class="spec-label">PLC</span><span class="spec-val">S7-300</span></div>
+            <div class="spec-item"><span class="spec-label">Sistema</span><span class="spec-val hl">TIA V13</span></div>
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    function renderPasswordsView() {
+      const lockCard = document.getElementById('lockCard');
+      const unlockedPanel = document.getElementById('unlockedPanel');
+
+      if (!vaultUnlocked) {
+        lockCard.style.display = 'block';
+        unlockedPanel.style.display = 'none';
+        return;
+      }
+
+      lockCard.style.display = 'none';
+      unlockedPanel.style.display = 'block';
+
+      const grid = document.getElementById('gridPasswords');
+      const searchVal = document.getElementById('globalSearch').value.toLowerCase();
+      const dataset = PASSWORDS_DATA[currentPassSub] || [];
+
+      let filtered = dataset.filter(sys => {
+        if (!searchVal) return true;
+        if (sys.name.toLowerCase().includes(searchVal) || (sys.category && sys.category.toLowerCase().includes(searchVal))) return true;
+        return sys.entries.some(e => e.label.toLowerCase().includes(searchVal) || e.value.toLowerCase().includes(searchVal) || (e.section && e.section.toLowerCase().includes(searchVal)));
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><p>No se encontraron credenciales.</p></div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((sys, idx) => `
+        <div class="pass-card">
+          <div class="pass-card-head">
+            <div class="pass-system-name">${sys.name}</div>
+            ${sys.category ? `<span class="pass-system-cat">${sys.category}</span>` : ''}
+          </div>
+          <div class="cred-rows">
+            ${sys.entries.map((ent, eIdx) => {
+              const isIP = ent.label.toLowerCase().includes('ip') || ent.value.match(/^(\d{1,3}\.){3}\d{1,3}$/);
+              const isPass = ent.label.toLowerCase().includes('pass') || ent.label.toLowerCase().includes('clave') || ent.label.toLowerCase().includes('pwd');
+              const valClass = isIP ? 'cred-val is-ip' : (isPass ? 'cred-val is-pass' : 'cred-val');
+              const uniqueId = `pass-${currentPassSub}-${idx}-${eIdx}`;
+
+              return `
+                <div class="cred-row">
+                  <span class="cred-label" title="${ent.section ? '['+ent.section+'] ' : ''}${ent.label}">${ent.section ? '['+ent.section+'] ' : ''}${ent.label}</span>
+                  <div class="cred-val-group">
+                    <span class="${valClass}" id="${uniqueId}" onclick="toggleReveal('${uniqueId}')" title="Clic para revelar">${ent.value}</span>
+                    <button class="btn-action-pill" onclick="copyText('${ent.value}')">Copiar</button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- PIN NUMPAD LOGIC ---
+    function pressDigit(digit) {
+      if (pinBuffer.length < 3) {
+        pinBuffer.push(digit);
+        updatePinDots();
       }
     }
+    function clearPIN() {
+      pinBuffer = [];
+      updatePinDots();
+      document.getElementById('pinError').textContent = '';
+    }
+    function updatePinDots() {
+      for (let i = 0; i < 3; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if (i < pinBuffer.length) dot.classList.add('filled');
+        else dot.classList.remove('filled');
+      }
+    }
+    function submitPIN() {
+      if (pinBuffer.length !== 3) {
+        document.getElementById('pinError').textContent = 'PIN incompleto.';
+        return;
+      }
+      if (pinBuffer.join('') === correctPIN.join('')) {
+        vaultUnlocked = true;
+        pinBuffer = [];
+        updatePinDots();
+        document.getElementById('pinError').textContent = '';
+        renderPasswordsView();
+        showToast('✓ Bóveda desbloqueada');
+      } else {
+        document.getElementById('pinError').textContent = 'PIN incorrecto.';
+        pinBuffer = [];
+        updatePinDots();
+      }
+    }
+    function relockVault() {
+      vaultUnlocked = false;
+      pinBuffer = [];
+      updatePinDots();
+      renderPasswordsView();
+      showToast('Bóveda bloqueada');
+    }
+    function toggleReveal(elementId) {
+      const el = document.getElementById(elementId);
+      if (el && el.classList.contains('is-pass')) el.classList.toggle('revealed');
+    }
 
+    // --- SEARCH & UTILS ---
+    function handleSearch() {
+      const q = document.getElementById('globalSearch').value;
+      document.getElementById('btnClearSearch').style.display = q ? 'flex' : 'none';
+      dcsPage = 1; plcPage = 1; convPage = 1;
+      renderCurrentView();
+    }
     function clearSearch() {
       document.getElementById('globalSearch').value = '';
-      handleSearch();
+      document.getElementById('btnClearSearch').style.display = 'none';
+      dcsPage = 1; plcPage = 1; convPage = 1;
+      renderCurrentView();
+    }
+    function changePage(dir) { dcsPage += dir; renderDCSView(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function changePLCPage(dir) { plcPage += dir; renderPLCView(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function changeConvPage(dir) { convPage += dir; renderConvView(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    function copyText(text) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Copiado: ${text}`);
+      });
     }
 
     function showToast(msg) {
-      const t = document.getElementById('appToast');
-      document.getElementById('toastMessage').innerText = msg;
-      t.classList.add('active');
-      setTimeout(() => t.classList.remove('active'), 2200);
+      const toast = document.getElementById('appToast');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.add('active');
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 2400);
     }
-
-    function copyToClipboard(val, title) {
-      if (!val) return;
-      if (!navigator.clipboard) {
-        const ta = document.createElement('textarea');
-        ta.value = val;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      } else {
-        navigator.clipboard.writeText(val);
-      }
-      showToast(`${title || 'Dato'} copiado: ${val}`);
-    }
-
-    function togglePassVisibility(id) {
-      const el = document.getElementById(id);
-      el.classList.toggle('revealed');
-    }
-
-    function getTagCategory(fc) {
-      const f = (fc || '').toUpperCase();
-      if (f.includes('ANALOG')) return { cls: 'badge-analog', cardCls: 'type-analog', name: 'Analógica' };
-      if (f.includes('DIGITAL')) return { cls: 'badge-digital', cardCls: 'type-digital', name: 'Digital' };
-      if (f.includes('MULTI-STATE') || f.includes('MSDD')) return { cls: 'badge-msdd', cardCls: 'type-msdd', name: 'MSDD' };
-      if (f.includes('STATION') || f.includes('CONTROL')) return { cls: 'badge-station', cardCls: 'type-station', name: 'Control' };
-      return { cls: 'badge-general', cardCls: 'type-general', name: fc || 'TAG' };
-    }
-
-    // Render ABB Bailey Tags with pagination
-    function renderDCS() {
-      const grid = document.getElementById('gridDCS');
-      let data = BAILEY_TAGS;
-
-      if (selectedPCU !== 'all') {
-        data = data.filter(item => item[5] === selectedPCU);
-      }
-
-      if (filterQuery) {
-        data = data.filter(item => {
-          const t = item[0].toLowerCase();
-          const d = item[1].toLowerCase();
-          const fc = item[2].toLowerCase();
-          const b = String(item[3]);
-          const cld = item[4].toLowerCase();
-          const p = String(item[5]);
-          return t.includes(filterQuery) || d.includes(filterQuery) || fc.includes(filterQuery) || b.includes(filterQuery) || cld.includes(filterQuery) || p.includes(filterQuery);
-        });
-      }
-
-      const total = data.length;
-      const totalPages = Math.ceil(total / PAGE_LIMIT) || 1;
-      if (currentPageIdx > totalPages) currentPageIdx = totalPages;
-
-      const start = (currentPageIdx - 1) * PAGE_LIMIT;
-      const end = Math.min(start + PAGE_LIMIT, total);
-      const pageSlice = data.slice(start, end);
-
-      document.getElementById('pageIndicator').innerText = `Mostrando ${total === 0 ? 0 : start + 1} - ${end} de ${total.toLocaleString()} Tags`;
-      document.getElementById('btnPrevPage').disabled = currentPageIdx <= 1;
-      document.getElementById('btnNextPage').disabled = currentPageIdx >= totalPages;
-
-      if (total === 0) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <p>No se encontraron señales ni tags con los filtros aplicados.</p>
-          </div>
-        `;
-        return;
-      }
-
-      let html = '';
-      pageSlice.forEach(item => {
-        const [tag, desc, fc, blk, cld, pcu, ctrl] = item;
-        const meta = getTagCategory(fc);
-
-        html += `
-          <div class="dcs-card ${meta.cardCls}">
-            <div class="card-row-top">
-              <div class="tag-title-wrap">
-                <span class="tag-title" title="${tag}">${tag}</span>
-                <button class="btn-copy-tag" title="Copiar TAG" onclick="copyToClipboard('${tag}', 'TAG')">📋</button>
-              </div>
-              <span class="badge-pill ${meta.cls}">${meta.name}</span>
-            </div>
-            <div class="tag-description">${desc || '<span style="color:var(--text-dim);">Sin descripción registrada</span>'}</div>
-            <div class="dcs-specs">
-              <div class="spec-item">
-                <span class="spec-label">PCU / Loop</span>
-                <span class="spec-val hl">${pcu}</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-label">Ctrl / Mod</span>
-                <span class="spec-val">${ctrl}</span>
-              </div>
-              <div class="spec-item">
-                <span class="spec-label">Bloque FC</span>
-                <span class="spec-val hl">${blk}</span>
-              </div>
-            </div>
-            ${cld ? `<div class="cld-footer" title="${cld}"><strong>CLD:</strong> ${cld}</div>` : ''}
-          </div>
-        `;
-      });
-
-      grid.innerHTML = html;
-    }
-
-    function changePage(delta) {
-      currentPageIdx += delta;
-      renderDCS();
-      window.scrollTo({ top: 110, behavior: 'smooth' });
-    }
-
-    // Render Passwords
-    function renderPasswords() {
-      const grid = document.getElementById('gridPasswords');
-      const list = PASSWORDS_DATA[currentPassSub] || [];
-      let filtered = list;
-
-      if (filterQuery) {
-        filtered = list.filter(sys => {
-          const name = sys.name.toLowerCase();
-          const cat = (sys.category || '').toLowerCase();
-          const matchEntry = sys.entries.some(e => 
-            (e.label && e.label.toLowerCase().includes(filterQuery)) ||
-            (e.value && e.value.toLowerCase().includes(filterQuery)) ||
-            (e.section && e.section.toLowerCase().includes(filterQuery)) ||
-            (e.extra && e.extra.toLowerCase().includes(filterQuery))
-          );
-          return name.includes(filterQuery) || cat.includes(filterQuery) || matchEntry;
-        });
-      }
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <p>No se encontraron credenciales ni sistemas con "${filterQuery}".</p>
-          </div>
-        `;
-        return;
-      }
-
-      let html = '';
-      filtered.forEach((sys, sysIdx) => {
-        let entriesHtml = '';
-        let lastSection = '';
-
-        sys.entries.forEach((entry, eIdx) => {
-          if (entry.section && entry.section !== lastSection && entry.section !== sys.category) {
-            entriesHtml += `<div class="pass-section-header">${entry.section}</div>`;
-            lastSection = entry.section;
-          }
-
-          const isIp = entry.label.toLowerCase().includes('ip') || /^1[0-9]{1,2}\./.test(entry.value);
-          const isPass = entry.label.toLowerCase().includes('pass') || entry.label.toLowerCase().includes('clave');
-          const passId = `pw_${sysIdx}_${eIdx}`;
-
-          const valClass = isIp ? 'is-ip' : (isPass ? 'is-pass' : '');
-          const labelText = entry.label || (isIp ? 'IP:' : 'Dato:');
-          const displayVal = entry.value || entry.extra || '';
-
-          entriesHtml += `
-            <div class="cred-row">
-              <span class="cred-label" title="${labelText}">${labelText}</span>
-              <div class="cred-val-group">
-                <span class="cred-val ${valClass}" id="${passId}" title="${displayVal}">${displayVal || '---'}</span>
-                ${isPass ? `<button class="btn-action-pill" title="Revelar" onclick="togglePassVisibility('${passId}')">👁️</button>` : ''}
-                ${displayVal ? `<button class="btn-action-pill" title="Copiar" onclick="copyToClipboard('${displayVal}', '${labelText}')">📋</button>` : ''}
-              </div>
-            </div>
-          `;
-        });
-
-        html += `
-          <div class="pass-card">
-            <div class="pass-card-head">
-              <span class="pass-system-name">${sys.name}</span>
-              ${sys.category ? `<span class="pass-system-cat">${sys.category}</span>` : ''}
-            </div>
-            <div class="cred-rows">
-              ${entriesHtml}
-            </div>
-          </div>
-        `;
-      });
-
-      grid.innerHTML = html;
-    }
-
-    // Startup
-    window.addEventListener('DOMContentLoaded', () => {
-      renderDCS();
-    });
   </script>
 </body>
 </html>
