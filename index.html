@@ -137,13 +137,17 @@
 
     /* Segmented Main Navigation */
     .segmented-control {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 6px;
       background: #080d17;
       padding: 4px;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .segmented-control::-webkit-scrollbar {
+    display: none;
     }
     .segment-btn {
       background: transparent;
