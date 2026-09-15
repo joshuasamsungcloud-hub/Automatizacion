@@ -1256,16 +1256,19 @@
       const unlockedPanel = document.getElementById('unlockedPanel');
 
       if (!vaultUnlocked) {
-        lockCard.style.display = 'block';
-        unlockedPanel.style.display = 'none';
+        if(lockCard) lockCard.style.display = 'block';
+        if(unlockedPanel) unlockedPanel.style.display = 'none';
         return;
       }
 
-      lockCard.style.display = 'none';
-      unlockedPanel.style.display = 'block';
+      if(lockCard) lockCard.style.display = 'none';
+      if(unlockedPanel) unlockedPanel.style.display = 'block';
 
       const grid = document.getElementById('gridPasswords');
-      const searchVal = document.getElementById('globalSearch').value.toLowerCase();
+      if(!grid) return;
+      
+      const searchInput = document.getElementById('globalSearch');
+      const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
       const dataset = PASSWORDS_DATA[currentPassSub] || [];
 
       let filtered = dataset.filter(sys => {
@@ -1291,13 +1294,14 @@
               const isPass = ent.label.toLowerCase().includes('pass') || ent.label.toLowerCase().includes('clave') || ent.label.toLowerCase().includes('pwd');
               const valClass = isIP ? 'cred-val is-ip' : (isPass ? 'cred-val is-pass' : 'cred-val');
               const uniqueId = `pass-${currentPassSub}-${idx}-${eIdx}`;
+              const fullLabel = (ent.section ? '['+ent.section+'] ' : '') + ent.label;
 
               return `
-                <div class="cred-row">
-                  <span class="cred-label" title="${ent.section ? '['+ent.section+'] ' : ''}${ent.label}">${ent.section ? '['+ent.section+'] ' : ''}${ent.label}</span>
-                  <div class="cred-val-group">
-                    <span class="${valClass}" id="${uniqueId}" onclick="toggleReveal('${uniqueId}')" title="Clic para revelar">${ent.value}</span>
-                    <button class="btn-action-pill" onclick="copyText('${ent.value}')">Copiar</button>
+                <div class="cred-row-stacked" style="background: rgba(255,255,255,0.03); padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; border: 1px solid var(--border-subtle);">
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; word-break: break-word;" title="${fullLabel}">${fullLabel}</div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <span class="${valClass}" id="${uniqueId}" onclick="toggleReveal('${uniqueId}')" style="word-break: break-all; font-size: 0.85rem;" title="Clic para revelar">${ent.value}</span>
+                    <button class="btn-action-pill" onclick="copyText('${ent.value}')" style="flex-shrink: 0;">Copiar</button>
                   </div>
                 </div>
               `;
@@ -1306,7 +1310,6 @@
         </div>
       `).join('');
     }
-
     // --- PIN NUMPAD LOGIC ---
     function pressDigit(digit) {
       if (pinBuffer.length < 3) {
