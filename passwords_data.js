@@ -1,5 +1,1229 @@
 const PASSWORDS_DATA = {
-  "papelera": [],
+  "papelera": [
+    {
+      "name": "GAW SYSTEM",
+      "category": "WINDOWS",
+      "entries": [
+        {
+          "section": "WINDOWS",
+          "label": "Username:",
+          "value": "Admin",
+          "extra": ""
+        },
+        {
+          "section": "WINDOWS",
+          "label": "Password:",
+          "value": "Siemens1234",
+          "extra": ""
+        },
+        {
+          "section": "OPC(only server)",
+          "label": "Username:",
+          "value": "OPC",
+          "extra": ""
+        },
+        {
+          "section": "OPC(only server)",
+          "label": "Password:",
+          "value": "GAW@Austria",
+          "extra": ""
+        },
+        {
+          "section": "PCS7",
+          "label": "Username:",
+          "value": "Password:",
+          "extra": ""
+        },
+        {
+          "section": "PCS7",
+          "label": "Administrator",
+          "value": "Kapfenberg123",
+          "extra": ""
+        },
+        {
+          "section": "PCS7",
+          "label": "EABT",
+          "value": "Kapfenberg",
+          "extra": ""
+        },
+        {
+          "section": "PCS7",
+          "label": "Luis321",
+          "value": "Luis321",
+          "extra": ""
+        },
+        {
+          "section": "AutomationX",
+          "label": "Username:",
+          "value": "Password:",
+          "extra": ""
+        },
+        {
+          "section": "AutomationX",
+          "label": "start",
+          "value": "start",
+          "extra": ""
+        },
+        {
+          "section": "AutomationX",
+          "label": "Maintenance",
+          "value": "gaw_engr",
+          "extra": ""
+        },
+        {
+          "section": "AutomationX",
+          "label": "gaw",
+          "value": "Kapfenberg",
+          "extra": ""
+        },
+        {
+          "section": "AutomationX",
+          "label": "Luis321",
+          "value": "Luis321",
+          "extra": ""
+        },
+        {
+          "section": "OPC GAW PI",
+          "label": "IP:",
+          "value": "151.110.4.106",
+          "extra": ""
+        },
+        {
+          "section": "OPC GAW PI",
+          "label": "Usuario:",
+          "value": "automatizacion",
+          "extra": ""
+        },
+        {
+          "section": "OPC GAW PI",
+          "label": "Password:",
+          "value": "1Oisengr2",
+          "extra": ""
+        },
+        {
+          "section": "COGENT DATAHUB",
+          "label": "IP:",
+          "value": "151.110.4.104",
+          "extra": ""
+        },
+        {
+          "section": "COGENT DATAHUB",
+          "label": "Usuario:",
+          "value": "Automatizacion",
+          "extra": ""
+        },
+        {
+          "section": "SERVER 001 GAW",
+          "label": "IP:",
+          "value": "151.110.8.10",
+          "extra": ""
+        },
+        {
+          "section": "SERVER 001 GAW",
+          "label": "Usuario:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "SERVER 001 GAW",
+          "label": "Password:",
+          "value": "Siemens1234",
+          "extra": ""
+        },
+        {
+          "section": "SERVER 002 GAW",
+          "label": "IP:",
+          "value": "151.110.8.11",
+          "extra": ""
+        },
+        {
+          "section": "SERVER 002 GAW",
+          "label": "Usuario:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "SERVER 002 GAW",
+          "label": "Password:",
+          "value": "Siemens1234",
+          "extra": ""
+        },
+        {
+          "section": "ESTACIÓN ING",
+          "label": "IP:",
+          "value": "151.110.8.12",
+          "extra": ""
+        },
+        {
+          "section": "ESTACIÓN ING",
+          "label": "Usuario:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "ESTACIÓN ING",
+          "label": "Password:",
+          "value": "Siemens1234",
+          "extra": ""
+        },
+        {
+          "section": "PC ENZIMATICO",
+          "label": "IP:",
+          "value": "151.110.4.28",
+          "extra": ""
+        },
+        {
+          "section": "PC ENZIMATICO",
+          "label": "Username:",
+          "value": "control",
+          "extra": ""
+        },
+        {
+          "section": "PC ENZIMATICO",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        },
+        {
+          "section": "PC ENZIMATICO",
+          "label": "IP:",
+          "value": "151.110.4.27",
+          "extra": ""
+        },
+        {
+          "section": "PC ENZIMATICO",
+          "label": "Password:",
+          "value": "100",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "VALZONE",
+      "category": "VIBRACIONES VALZONE",
+      "entries": [
+        {
+          "section": "VIBRACIONES VALZONE",
+          "label": "IP:",
+          "value": "10.51.3.20",
+          "extra": ""
+        },
+        {
+          "section": "VIBRACIONES VALZONE",
+          "label": "Username:",
+          "value": ".\\dna",
+          "extra": ""
+        },
+        {
+          "section": "VIBRACIONES VALZONE",
+          "label": "Password:",
+          "value": "A#nd007.",
+          "extra": ""
+        },
+        {
+          "section": "PANTALLAS VALZONE",
+          "label": "User: M450VALZ-PC1\\M450VALZ",
+          "value": "Password:",
+          "extra": ""
+        },
+        {
+          "section": "PANTALLAS VALZONE",
+          "label": "151.110.4.11 (PC2)",
+          "value": "m450valz",
+          "extra": ""
+        },
+        {
+          "section": "PANTALLAS VALZONE",
+          "label": "151.110.4.12 (PC1)",
+          "value": "m450valz",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "REFINADORES (HYDCOM)",
+      "category": "PLC ANDRITZ",
+      "entries": [
+        {
+          "section": "PLC ANDRITZ",
+          "label": "IP:",
+          "value": "151.110.15.1",
+          "extra": ""
+        },
+        {
+          "section": "PLC ANDRITZ",
+          "label": "Usuario:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "PLC ANDRITZ",
+          "label": "Password:",
+          "value": "andadmin",
+          "extra": ""
+        },
+        {
+          "section": "PLC ANDRITZ",
+          "label": "USER INGENIERIA",
+          "value": ""
+        },
+        {
+          "section": "PLC ANDRITZ",
+          "label": "User",
+          "value": "engc",
+          "extra": ""
+        },
+        {
+          "section": "PLC ANDRITZ",
+          "label": "Password",
+          "value": "engc",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "POPE",
+      "category": "ESTA. INGENIERIA",
+      "entries": [
+        {
+          "section": "ESTA. INGENIERIA",
+          "label": "IP",
+          "value": "192.168.65.244",
+          "extra": ""
+        },
+        {
+          "section": "ESTA. INGENIERIA",
+          "label": "User y Pass:",
+          "value": "Cortadora",
+          "extra": ""
+        },
+        {
+          "section": "NANO PC",
+          "label": "Username:",
+          "value": "ELEKTRO",
+          "extra": ""
+        },
+        {
+          "section": "NANO PC",
+          "label": "Password:",
+          "value": "1842",
+          "extra": ""
+        },
+        {
+          "section": "NANO PC",
+          "label": "IP1:",
+          "value": "192.168.65.200",
+          "extra": ""
+        },
+        {
+          "section": "NANO PC",
+          "label": "IP2:",
+          "value": "151.110.4.40",
+          "extra": ""
+        },
+        {
+          "section": "LOGIN DENTRO NANO PC",
+          "label": "Username:",
+          "value": "admin",
+          "extra": ""
+        },
+        {
+          "section": "LOGIN DENTRO NANO PC",
+          "label": "Password:",
+          "value": "1842",
+          "extra": ""
+        },
+        {
+          "section": "LOGIN DENTRO NANO PC",
+          "label": "PLC (LOGICAS CON PASS)",
+          "value": ""
+        },
+        {
+          "section": "LOGIN DENTRO NANO PC",
+          "label": "Password:",
+          "value": "1842",
+          "extra": ""
+        },
+        {
+          "section": "SCALANCE AGV",
+          "label": "Password:",
+          "value": "bellmer1842",
+          "extra": ""
+        },
+        {
+          "section": "RUNTIME POPE",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "PULPEYE",
+      "category": "",
+      "entries": [
+        {
+          "section": "PULPEYE",
+          "label": "IP:",
+          "value": "Password:",
+          "extra": ""
+        },
+        {
+          "section": "PULPEYE",
+          "label": "10.51.4.238",
+          "value": "pulp",
+          "extra": ""
+        },
+        {
+          "section": "PULPEYE",
+          "label": "10.51.4.240",
+          "value": "pulp",
+          "extra": ""
+        },
+        {
+          "section": "PULPEYE VNC",
+          "label": "IP:",
+          "value": "Password:",
+          "extra": ""
+        },
+        {
+          "section": "PULPEYE VNC",
+          "label": "10.51.4.238",
+          "value": "pulpeye",
+          "extra": ""
+        },
+        {
+          "section": "PULPEYE VNC",
+          "label": "10.51.4.240",
+          "value": "pulpeye",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "BOBINADORA",
+      "category": "PLC (LOGICAS CON PASS)",
+      "entries": [
+        {
+          "section": "PLC (LOGICAS CON PASS)",
+          "label": "PLC (LOGICAS CON PASS)",
+          "value": ""
+        },
+        {
+          "section": "PLC (LOGICAS CON PASS)",
+          "label": "Password:",
+          "value": "safe",
+          "extra": ""
+        },
+        {
+          "section": "WINDPOSIT CONFIGURATION",
+          "label": "Password:",
+          "value": "927161",
+          "extra": ""
+        },
+        {
+          "section": "AJUSTE CURVAS",
+          "label": "Password:",
+          "value": "121212",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "MX (QCS Y WISS)",
+      "category": "QCS",
+      "entries": [
+        {
+          "section": "QCS",
+          "label": "Username:",
+          "value": "Password:",
+          "extra": ""
+        },
+        {
+          "section": "QCS",
+          "label": "QCSAdmin",
+          "value": "Hmxresult1#",
+          "extra": ""
+        },
+        {
+          "section": "QCS",
+          "label": "operator",
+          "value": "operator",
+          "extra": ""
+        },
+        {
+          "section": "WIS OPERADOR SC",
+          "label": "Username:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "WIS OPERADOR SC",
+          "label": "Password:",
+          "value": "papeles2016",
+          "extra": ""
+        },
+        {
+          "section": "WIS SERVER SC",
+          "label": "Username:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "WIS SERVER SC",
+          "label": "Password:",
+          "value": "admin",
+          "extra": ""
+        },
+        {
+          "section": "WIS SERVER lab",
+          "label": "Username:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "WIS SERVER lab",
+          "label": "Password:",
+          "value": "admin",
+          "extra": ""
+        },
+        {
+          "section": "RAE CONTROL",
+          "label": "Parametro:",
+          "value": "Connection parameters",
+          "extra": ""
+        },
+        {
+          "section": "RAE CONTROL",
+          "label": "Dato:",
+          "value": "RAE.stn -slcp",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "ESTUCADORA",
+      "category": "PLC ESTUCADOR",
+      "entries": [
+        {
+          "section": "PLC ESTUCADOR",
+          "label": "IP:",
+          "value": "151.110.3.20",
+          "extra": ""
+        },
+        {
+          "section": "PLC ESTUCADOR",
+          "label": "Usuario:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "PLC ESTUCADOR",
+          "label": "Password:",
+          "value": "2025oisengr",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "FASTPAP",
+      "category": "",
+      "entries": [
+        {
+          "section": "FASTPAP",
+          "label": "Username:",
+          "value": "admin",
+          "extra": ""
+        },
+        {
+          "section": "FASTPAP",
+          "label": "Password:",
+          "value": "100",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "DCS FOXBORO",
+      "category": "ARCHESTRA",
+      "entries": [
+        {
+          "section": "ARCHESTRA",
+          "label": "Username:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "ARCHESTRA",
+          "label": "Password:",
+          "value": "controlsoftware",
+          "extra": ""
+        },
+        {
+          "section": "WINDOWS VIEWER",
+          "label": "Username:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "WINDOWS VIEWER",
+          "label": "Password:",
+          "value": "controlsoftware",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "PRENSAS",
+      "category": "PRENSAS 1",
+      "entries": [
+        {
+          "section": "PRENSAS 1",
+          "label": "IP:",
+          "value": "151.110.3.15",
+          "extra": ""
+        },
+        {
+          "section": "PRENSAS 1",
+          "label": "Password:",
+          "value": "100",
+          "extra": ""
+        },
+        {
+          "section": "PRENSAS 2 y 3",
+          "label": "IP:",
+          "value": "151.110.4.2",
+          "extra": ""
+        },
+        {
+          "section": "PRENSAS 2 y 3",
+          "label": "Password:",
+          "value": "100",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "VIDEO WALL",
+      "category": "VIDEO WALL MAQUINA",
+      "entries": [
+        {
+          "section": "VIDEO WALL MAQUINA",
+          "label": "Username:",
+          "value": "ORANGE-ADMINISTRATOR",
+          "extra": ""
+        },
+        {
+          "section": "VIDEO WALL MAQUINA",
+          "label": "Password:",
+          "value": "oisengr_2024",
+          "extra": ""
+        },
+        {
+          "section": "VIDEO WALL PASILLO MAQUINA",
+          "label": "Username:",
+          "value": "118madmonctlt",
+          "extra": ""
+        },
+        {
+          "section": "VIDEO WALL PASILLO MAQUINA",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        },
+        {
+          "section": "App LEDPLAYER",
+          "label": "Username:",
+          "value": ".\\sonda",
+          "extra": ""
+        },
+        {
+          "section": "App LEDPLAYER",
+          "label": "Password:",
+          "value": "Sin pass",
+          "extra": ""
+        },
+        {
+          "section": "WINDOWS",
+          "label": "Username:",
+          "value": ".\\administrador",
+          "extra": ""
+        },
+        {
+          "section": "WINDOWS",
+          "label": "Password:",
+          "value": "oisengr_2024",
+          "extra": ""
+        },
+        {
+          "section": "Camaras",
+          "label": "Username:",
+          "value": ".\\administrador",
+          "extra": ""
+        },
+        {
+          "section": "Camaras",
+          "label": "Password:",
+          "value": "oisengr_2024",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "CAMARAS",
+      "category": "Camaras Hickvision BOB",
+      "entries": [
+        {
+          "section": "Camaras Hickvision BOB",
+          "label": "Username:",
+          "value": ""
+        },
+        {
+          "section": "Camaras Hickvision BOB",
+          "label": "Password:",
+          "value": "1Oisengr2",
+          "extra": ""
+        },
+        {
+          "section": "PC CAMARAS OFICINA",
+          "label": "Username:",
+          "value": "Camaras",
+          "extra": ""
+        },
+        {
+          "section": "PC CAMARAS OFICINA",
+          "label": "Password:",
+          "value": "oisengr_2024",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS VALMET",
+          "label": "IP:",
+          "value": "10.51.3.229",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS VALMET",
+          "label": "Username:",
+          "value": "vsys-admin",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS VALMET",
+          "label": "Password:",
+          "value": "vsys-admin",
+          "extra": ""
+        },
+        {
+          "section": "PC ESTACION CAMARA",
+          "label": "Username:",
+          "value": "camaras",
+          "extra": ""
+        },
+        {
+          "section": "PC ESTACION CAMARA",
+          "label": "Password:",
+          "value": "cmpc2021",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS CONVERSION",
+          "label": "IP:",
+          "value": "10.51.7.100",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS CONVERSION",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS METSO",
+          "label": "Username:",
+          "value": "Administrator",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS METSO",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        },
+        {
+          "section": "APLICACIÓN DAJHUA",
+          "label": "Username:",
+          "value": "admin",
+          "extra": ""
+        },
+        {
+          "section": "APLICACIÓN DAJHUA",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS DAJHUA",
+          "label": "Username:",
+          "value": "admin",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS DAJHUA",
+          "label": "Password:",
+          "value": "admin2018",
+          "extra": ""
+        },
+        {
+          "section": "CAMARAS DAJHUA",
+          "label": "Password:",
+          "value": "cmpc2020",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "UPS",
+      "category": "SALA DE RACK 4 UPS A",
+      "entries": [
+        {
+          "section": "SALA DE RACK 4 UPS A",
+          "label": "IP:",
+          "value": "151.110.10.201",
+          "extra": ""
+        },
+        {
+          "section": "SALA DE RACK 4 UPS A",
+          "label": "Usuario:",
+          "value": "apc",
+          "extra": ""
+        },
+        {
+          "section": "SALA DE RACK 4 UPS A",
+          "label": "Password:",
+          "value": "apc",
+          "extra": ""
+        },
+        {
+          "section": "SALA DE RACK 4 UPS B",
+          "label": "IP:",
+          "value": "151.110.10.200",
+          "extra": ""
+        },
+        {
+          "section": "SALA DE RACK 4 UPS B",
+          "label": "Usuario:",
+          "value": "apc",
+          "extra": ""
+        },
+        {
+          "section": "SALA DE RACK 4 UPS B",
+          "label": "Password:",
+          "value": "apc",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "PPO VALMET",
+      "category": "",
+      "entries": [
+        {
+          "section": "PPO VALMET",
+          "label": "IP:",
+          "value": "10.51.1.232",
+          "extra": ""
+        },
+        {
+          "section": "PPO VALMET",
+          "label": "Username:",
+          "value": "PI",
+          "extra": ""
+        },
+        {
+          "section": "PPO VALMET",
+          "label": "Password:",
+          "value": "pipi1234",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "LETRERO",
+      "category": "PC LETRERO LED",
+      "entries": [
+        {
+          "section": "PC LETRERO LED",
+          "label": "Username:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "PC LETRERO LED",
+          "label": "Password:",
+          "value": "oisengr2025",
+          "extra": ""
+        },
+        {
+          "section": "LETRERO LED (VNC) 118MADMONICTL",
+          "label": "Username:",
+          "value": "administrator",
+          "extra": ""
+        },
+        {
+          "section": "LETRERO LED (VNC) 118MADMONICTL",
+          "label": "Password:",
+          "value": "Soporte_2023",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "ANDRITZ",
+      "category": "Estación operadores",
+      "entries": [
+        {
+          "section": "Estación operadores",
+          "label": "Username:",
+          "value": "usuario",
+          "extra": ""
+        },
+        {
+          "section": "Estación operadores",
+          "label": "Password:",
+          "value": "gnomes",
+          "extra": ""
+        },
+        {
+          "section": "Estación operadores",
+          "label": "Username:",
+          "value": "admin",
+          "extra": ""
+        },
+        {
+          "section": "Estación operadores",
+          "label": "Password:",
+          "value": "gnomes",
+          "extra": ""
+        },
+        {
+          "section": "PC VIBRACIONES ANDRITZ",
+          "label": "Username:",
+          "value": "andritz",
+          "extra": ""
+        },
+        {
+          "section": "PC VIBRACIONES ANDRITZ",
+          "label": "Password:",
+          "value": "oisengr2022",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "SAP",
+      "category": "",
+      "entries": [
+        {
+          "section": "SAP",
+          "label": "Username:",
+          "value": "maintenance",
+          "extra": ""
+        },
+        {
+          "section": "SAP",
+          "label": "1801LCT:",
+          "value": "inicio04",
+          "extra": ""
+        },
+        {
+          "section": "SAP",
+          "label": "MM03:",
+          "value": "Visualizar equipo",
+          "extra": ""
+        },
+        {
+          "section": "SAP",
+          "label": "Centro:",
+          "value": "1801",
+          "extra": ""
+        },
+        {
+          "section": "SAP",
+          "label": "Texto:",
+          "value": "\"*texto\"",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "SERVERMAN",
+      "category": "DOCUMENTOS",
+      "entries": [
+        {
+          "section": "DOCUMENTOS",
+          "label": "Username:",
+          "value": "control",
+          "extra": ""
+        },
+        {
+          "section": "DOCUMENTOS",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        },
+        {
+          "section": "INICIO",
+          "label": "Username:",
+          "value": "Dcs",
+          "extra": ""
+        },
+        {
+          "section": "INICIO",
+          "label": "Password:",
+          "value": "Dcs",
+          "extra": ""
+        },
+        {
+          "section": "INICIO",
+          "label": "GESTION IP",
+          "value": ""
+        },
+        {
+          "section": "INICIO",
+          "label": "Username:",
+          "value": "gipadmin",
+          "extra": ""
+        },
+        {
+          "section": "INICIO",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "Pantalla TOUCH-SALA ING.",
+      "category": "",
+      "entries": [
+        {
+          "section": "Pantalla TOUCH-SALA ING.",
+          "label": "Username:",
+          "value": "control",
+          "extra": ""
+        },
+        {
+          "section": "Pantalla TOUCH-SALA ING.",
+          "label": "Password:",
+          "value": "papeles",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "STEP 7 REMOTO (BOBINADORA Y TRACK ROLL)",
+      "category": "ESCRITORIO REMOTO",
+      "entries": [
+        {
+          "section": "ESCRITORIO REMOTO",
+          "label": "IP:",
+          "value": "10.53.73.66",
+          "extra": ""
+        },
+        {
+          "section": "ESCRITORIO REMOTO",
+          "label": "User:",
+          "value": "administrador",
+          "extra": ""
+        },
+        {
+          "section": "ESCRITORIO REMOTO",
+          "label": "Password:",
+          "value": "oisengr",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "Estaciones antiguas",
+      "category": "",
+      "entries": [
+        {
+          "section": "Estaciones antiguas",
+          "label": "Username:",
+          "value": "FOX",
+          "extra": ""
+        },
+        {
+          "section": "Estaciones antiguas",
+          "label": "Password:",
+          "value": "gnomes",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "Harmony OPC",
+      "category": "",
+      "entries": [
+        {
+          "section": "Escritorio remoto",
+          "label": "Username:",
+          "value": "Password:",
+          "extra": ""
+        },
+        {
+          "section": "Escritorio remoto",
+          "label": "",
+          "value": "ABB.123!",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "DCS BAILEY",
+      "category": "ESTACIÓN ING IMA",
+      "entries": [
+        {
+          "section": "ESTACIÓN ING IMA",
+          "label": "Username:",
+          "value": "Administrator",
+          "extra": ""
+        },
+        {
+          "section": "ESTACIÓN ING IMA",
+          "label": "Password:",
+          "value": "IMA",
+          "extra": ""
+        },
+        {
+          "section": "ESTACIÓN ING NUEVA (ABB)",
+          "label": "Username:",
+          "value": "administrador",
+          "extra": ""
+        },
+        {
+          "section": "ESTACIÓN ING NUEVA (ABB)",
+          "label": "Password:",
+          "value": "ControlSoftware",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "DECANTER",
+      "category": "ADMIN EN HMI",
+      "entries": [
+        {
+          "section": "ADMIN EN HMI",
+          "label": "Username:",
+          "value": "ALCE",
+          "extra": ""
+        },
+        {
+          "section": "ADMIN EN HMI",
+          "label": "Password:",
+          "value": "acs.880",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "ControlAdvisor",
+      "category": "",
+      "entries": [
+        {
+          "section": "ControlAdvisor",
+          "label": "Username:",
+          "value": "ControlAdvisor",
+          "extra": ""
+        },
+        {
+          "section": "ControlAdvisor",
+          "label": "Password:",
+          "value": "Password1234567#",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "PLC TEMP REFINADORES SALA 10",
+      "category": "Estaciones antiguas",
+      "entries": [
+        {
+          "section": "Estaciones antiguas",
+          "label": "IP",
+          "value": "151.110.15.202",
+          "extra": ""
+        },
+        {
+          "section": "Estaciones antiguas",
+          "label": "Username:",
+          "value": ""
+        },
+        {
+          "section": "Estaciones antiguas",
+          "label": "Password:",
+          "value": "andadmin",
+          "extra": ""
+        },
+        {
+          "section": "MAQUINA VIRTUAL",
+          "label": "Username:",
+          "value": ""
+        },
+        {
+          "section": "MAQUINA VIRTUAL",
+          "label": "Password:",
+          "value": "Ae000760",
+          "extra": ""
+        },
+        {
+          "section": "PLC",
+          "label": "Username:",
+          "value": "Midroc1234",
+          "extra": ""
+        },
+        {
+          "section": "PLC",
+          "label": "Password:",
+          "value": "Midroc1234",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "ANTIVIRUS TxOne",
+      "category": "USB PG",
+      "entries": [
+        {
+          "section": "USB PG",
+          "label": "Password:",
+          "value": "oisengr.2025",
+          "extra": ""
+        }
+      ]
+    },
+    {
+      "name": "MESA FLEXILINE",
+      "category": "INGRESO A PANEL",
+      "entries": [
+        {
+          "section": "INGRESO A PANEL",
+          "label": "Operator",
+          "value": "zXYUnPq8h2",
+          "extra": ""
+        },
+        {
+          "section": "INGRESO A PANEL",
+          "label": "Admin",
+          "value": "TZ500z7YC2",
+          "extra": ""
+        }
+      ]
+    }
+  ],
   "conversion": [
     {
       "name": "JAGENBERG",
