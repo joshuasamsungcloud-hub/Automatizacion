@@ -774,23 +774,31 @@
         </div>
       </div>
 
-      <!-- Segmented Navigation (2 Major Sessions) -->
-      <div class="segmented-control">
+     <!-- Segmented Navigation (4 Major Sessions) -->
+      <div class="segmented-control" style="grid-template-columns: repeat(4, 1fr);">
         <button class="segment-btn active" id="seg-abb" onclick="switchSession('abb')">
-          <span class="icon-accent">🎛️</span> ABB Bailey DCS
+          <span class="icon-accent">🎛️</span> DCS Bailey
+        </button>
+        <button class="segment-btn" id="seg-plc" onclick="switchSession('plc')">
+          <span class="icon-accent">⚡</span> PLC Máquina
+        </button>
+        <button class="segment-btn" id="seg-conv" onclick="switchSession('conv')">
+          <span class="icon-accent">📦</span> Conversión
         </button>
         <button class="segment-btn" id="seg-passwords" onclick="switchSession('passwords')">
-          <span class="icon-accent">🔒</span> Claves & Red OT
+          <span class="icon-accent">🔒</span> Claves OT
         </button>
       </div>
 
-      <!-- Sub-Pills for Passwords Section -->
+      <!-- Sub-Pills Bar -->
+      <div class="subnav-pills" id="subnavPLC" style="display: none;"></div>
+      <div class="subnav-pills" id="subnavConv" style="display: none;"></div>
       <div class="subnav-pills" id="subnavPasswords" style="display: none;">
         <button class="sub-pill active" id="pill-papelera" onclick="switchPasswordSub('papelera')">
           🏭 Máquina Papelera (29)
         </button>
         <button class="sub-pill" id="pill-conversion" onclick="switchPasswordSub('conversion')">
-          📦 Conversión (6)
+          📦 Red Conversión (6)
         </button>
       </div>
     </div>
@@ -839,7 +847,29 @@
         </div>
       </div>
     </div>
+  <!-- View: Señales E/S PLC Máquina -->
+    <div id="viewPLC" style="display: none;">
+      <div class="items-grid" id="gridPLC"></div>
+      <div class="pagination-bar" id="plcPagination">
+        <span class="page-indicator" id="plcPageIndicator">Cargando señales PLC...</span>
+        <div class="page-nav-btns">
+          <button class="btn-nav-page" id="btnPrevPLC" onclick="changePLCPage(-1)">◀ Anterior</button>
+          <button class="btn-nav-page" id="btnNextPLC" onclick="changePLCPage(1)">Siguiente ▶</button>
+        </div>
+      </div>
+    </div>
 
+    <!-- View: Señales E/S Conversión -->
+    <div id="viewConv" style="display: none;">
+      <div class="items-grid" id="gridConv"></div>
+      <div class="pagination-bar" id="convPagination">
+        <span class="page-indicator" id="convPageIndicator">Cargando señales Conversión...</span>
+        <div class="page-nav-btns">
+          <button class="btn-nav-page" id="btnPrevConv" onclick="changeConvPage(-1)">◀ Anterior</button>
+          <button class="btn-nav-page" id="btnNextConv" onclick="changeConvPage(1)">Siguiente ▶</button>
+        </div>
+      </div>
+    </div>
     <!-- View: Passwords & Network OT -->
     <div id="viewPasswords" style="display: none;">
 
