@@ -949,19 +949,7 @@
     let currentPLCTab = '';
     let currentConvTab = '';
 
-    // --- INITIALIZATION (LEE EL ARCHIVO EXTERNO) ---
-    window.addEventListener('DOMContentLoaded', () => {
-      renderCurrentView(); // Muestra DCS por defecto
-      
-      // Magia: Cargar el archivo de 4.7MB automáticamente desde GitHub
-      fetch('datos_plc.json')
-        .then(response => {
-          if (!response.ok) throw new Error("No se pudo cargar el archivo");
-          return response.json();
-        })
-        .then(data => {
-          PLC_DATA = data;
-          // --- INITIALIZATION ---
+    // --- INITIALIZATION ---
     window.addEventListener('DOMContentLoaded', () => {
       renderCurrentView(); // Muestra DCS por defecto
       
@@ -987,14 +975,12 @@
             totalTags += equipo.length;
           });
           
-          // Muestra el número con formato (ej. 32,540 Tags)
+          // Muestra el número con formato
           const counter = document.getElementById('counterPill');
           if (counter) counter.textContent = totalTags.toLocaleString() + " Tags";
           // --------------------------------------------------
 
           // Seleccionar primer equipo por defecto si existe
-          const maqKeys = Object.keys(PLC_DATA.maquina || {});
-          // Asignar los primeros equipos a la barra secundaria
           const maqKeys = Object.keys(PLC_DATA.maquina || {});
           if (maqKeys.length > 0) currentPLCTab = maqKeys[0];
 
@@ -1002,13 +988,14 @@
           if (convKeys.length > 0) currentConvTab = convKeys[0];
 
           buildSubnavs();
-          showToast("Base de datos Máquina/Conversión conectada ✓");
+          showToast("Base de Datos S7 conectada ✓");
         })
         .catch(err => {
-          console.warn("Sube el archivo datos_plc.json a GitHub junto al index.html");
+          console.warn("Recuerda subir datos_plc.json a GitHub.");
         });
     });
 
+    // --- NAVIGATION ---
     // --- NAVIGATION & ROUTING ---
     function switchSession(session) {
       currentSession = session;
