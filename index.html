@@ -1171,21 +1171,10 @@
       
       let filtered = items;
       if (searchVal) {
-        filtered = items.filter(i => {
-          // Detectamos automáticamente si las columnas están desordenadas en el JSON
-          const isOldFormat = (i[2] !== "BOOL" && i[2] !== "REAL" && i[2] !== "INT" && i[2] !== "WORD" && i[2] !== "DI" && i[2] !== "DO");
-          
-          const tagStr = String(isOldFormat ? i[1] : i[0]).toLowerCase();
-          const addrStr = String(isOldFormat ? i[0] : i[1]).toLowerCase();
-          const descStr = String(isOldFormat ? i[2] : i[3]).toLowerCase();
-          
-          // Comparamos sin espacios para que "E39.4" coincida con "E      39.4"
-          const tagNoSpaces = tagStr.replace(/\s+/g, '');
-          const addrNoSpaces = addrStr.replace(/\s+/g, '');
-
-          return tagNoSpaces.includes(searchNoSpaces) || 
-                 addrNoSpaces.includes(searchNoSpaces) || 
-                 descStr.includes(searchVal);
+        const searchClean = searchVal.replace(/\s+/g, ''); 
+        filtered = items.filter(item => {
+          const textToSearch = item.join(' ').toLowerCase().replace(/\s+/g, '');
+          return textToSearch.includes(searchClean);
         });
       }
 
