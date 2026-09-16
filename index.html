@@ -1362,10 +1362,11 @@
     
     function relockVault() {
       vaultUnlocked = false;
-      pinBuffer = [];
-      updatePinDots();
+      PASSWORDS_DATA = {}; // Destruye los datos de la memoria
+      const pwdInput = document.getElementById('vaultPassword');
+      if (pwdInput) pwdInput.value = '';
       renderPasswordsView();
-      showToast('Bóveda bloqueada');
+      if (typeof showToast === 'function') showToast("Bóveda bloqueada 🔒");
     }
     function toggleReveal(elementId) {
       const el = document.getElementById(elementId);
