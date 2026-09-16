@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Automation Hub • DCS & Operations Suite</title>
   <link rel="manifest" href="manifest.json">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="theme-color" content="#090d16">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -888,29 +889,10 @@
         <h2>Bóveda de Seguridad OT</h2>
         <p>Acceso restringido para ingenieros de automatización. Ingresa el PIN de autorización para revelar contraseñas e IPs.</p>
         
-        <div class="numpad-dots">
-          <div class="pin-dot" id="dot-0"></div>
-          <div class="pin-dot" id="dot-1"></div>
-          <div class="pin-dot" id="dot-2"></div>
-        </div>
-
-        <div class="pin-numpad">
-          <button class="btn-num" onclick="pressDigit('1')">1</button>
-          <button class="btn-num" onclick="pressDigit('2')">2</button>
-          <button class="btn-num" onclick="pressDigit('3')">3</button>
-          <button class="btn-num" onclick="pressDigit('4')">4</button>
-          <button class="btn-num" onclick="pressDigit('5')">5</button>
-          <button class="btn-num" onclick="pressDigit('6')">6</button>
-          <button class="btn-num" onclick="pressDigit('7')">7</button>
-          <button class="btn-num" onclick="pressDigit('8')">8</button>
-          <button class="btn-num" onclick="pressDigit('9')">9</button>
-          <button class="btn-num" style="font-size:0.9rem;" onclick="clearPIN()">BORRAR</button>
-          <button class="btn-num" onclick="pressDigit('0')">0</button>
-          <button class="btn-num" style="font-size:0.9rem; color:var(--cyan);" onclick="submitPIN()">OK</button>
-        </div>
-
-        <div class="pin-err-msg" id="pinError"></div>
-      </div>
+        <div id="secureLogin" style="max-width: 300px; margin: 20px auto; text-align: center;">
+  <input type="password" id="vaultPassword" placeholder="Contraseña Maestra" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface-light); color: var(--text-main); margin-bottom: 15px; font-size: 1rem; text-align: center;">
+  <button class="btn-action-pill" onclick="unlockVaultAES()" style="width: 100%; padding: 12px; font-size: 1rem;">Desbloquear Bóveda</button>
+</div>
 
       <!-- Unlocked State -->
       <div id="unlockedPanel" style="display: none;">
@@ -940,8 +922,47 @@
     // --- VARIABLES DE ESTADO ---
     let currentSession = 'abb';
     let currentPCUFilter = 'all';
-    let pinBuffer = [];
-    const correctPIN = ['1', '5', '9'];
+   // --- SEGURIDAD AES Y AUTO-BLOQUEO ---
+    let inactivityTimer;
+
+    function resetTimer() {
+      clearTimeout(inactivityTimer);
+      if (vaultUnlocked) {
+        inactivityTimer = setTimeout(() => {
+          vaultUnlocked = false;
+          PASSWORDS_DATA = {}; // Destruye los datos de la memoria RAM
+          const pwdInput = document.getElementById('vaultPassword');
+          if (pwdInput) pwdInput.value = '';
+          renderPasswordsView();
+          if (typeof showToast === 'function') showToast("Bóveda bloqueada por inactividad 🔒");
+        }, 180000); // 3 minutos
+      }
+    }
+
+    // Monitorear uso para evitar el auto-bloqueo si estás leyendo
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('touchstart', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+
+    function unlockVaultAES() {
+      const pwd = document.getElementById('vaultPassword').value;
+      try {
+        // Magia matemática: Desencriptar con tu clave
+        const bytes = CryptoJS.AES.decrypt(ENCRYPTED_VAULT, pwd);
+        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+        
+        if (!decryptedData) throw new Error("Clave inválida");
+        
+        PASSWORDS_DATA = JSON.parse(decryptedData);
+        vaultUnlocked = true;
+        renderPasswordsView();
+        resetTimer();
+        if (typeof showToast === 'function') showToast("Bóveda Desbloqueada ✓");
+      } catch (error) {
+        if (typeof showToast === 'function') showToast("❌ Contraseña incorrecta");
+        else alert("Contraseña incorrecta");
+      }
+    }
     let vaultUnlocked = false;
     let currentPassSub = 'maquina';
 
@@ -1330,18 +1351,7 @@
         </div>
       `).join('');
     }
-    // --- PIN NUMPAD LOGIC ---
-    function pressDigit(digit) {
-      if (pinBuffer.length < 3) {
-        pinBuffer.push(digit);
-        updatePinDots();
-      }
-    }
-    function clearPIN() {
-      pinBuffer = [];
-      updatePinDots();
-      document.getElementById('pinError').textContent = '';
-    }
+    
     function updatePinDots() {
       for (let i = 0; i < 3; i++) {
         const dot = document.getElementById(`dot-${i}`);
@@ -1349,24 +1359,7 @@
         else dot.classList.remove('filled');
       }
     }
-    function submitPIN() {
-      if (pinBuffer.length !== 3) {
-        document.getElementById('pinError').textContent = 'PIN incompleto.';
-        return;
-      }
-      if (pinBuffer.join('') === correctPIN.join('')) {
-        vaultUnlocked = true;
-        pinBuffer = [];
-        updatePinDots();
-        document.getElementById('pinError').textContent = '';
-        renderPasswordsView();
-        showToast('✓ Bóveda desbloqueada');
-      } else {
-        document.getElementById('pinError').textContent = 'PIN incorrecto.';
-        pinBuffer = [];
-        updatePinDots();
-      }
-    }
+    
     function relockVault() {
       vaultUnlocked = false;
       pinBuffer = [];
