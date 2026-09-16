@@ -1220,32 +1220,47 @@
       }
 
       container.innerHTML = paginated.map(item => {
-        // Detectamos si es el formato antiguo o el nuevo del TIA Portal V13
-        const isOldFormat = (item[2] !== "BOOL" && item[2] !== "REAL" && item[2] !== "INT" && item[2] !== "WORD" && item[2] !== "DI" && item[2] !== "DO");
+        let tag, address, desc, dataType, extraDbInfo = "";
+
+        // Detectar automáticamente si es un formato de Alarma HMI (La columna 4 contiene el DB)
+        const isHmiAlarm = item[3] && String(item[3]).toUpperCase().includes('DB');
+        const isOldFormat = !isHmiAlarm && (item[2] !== "BOOL" && item[2] !== "REAL" && item[2] !== "INT" && item[2] !== "WORD" && item[2] !== "DI" && item[2] !== "DO" && item[2] !== "ALARM");
         
-        let address = isOldFormat ? item[0] : item[1];
-        let tag = isOldFormat ? item[1] : item[0];
-        let desc = isOldFormat ? item[2] : item[3];
-        let dataType = isOldFormat ? 'BOOL' : item[2];
+        if (isHmiAlarm) {
+            // Es formato de Alarma HMI
+            tag = item[1]; // TEXTO ALARMA
+            address = item[0]; // ID
+            desc = item[2]; // VARIABLE DE DISPARO
+            dataType = 'ALARM'; // Le ponemos etiqueta de Alarma
+            extraDbInfo = `<div class="spec-item"><span class="spec-label">Data Block</span><span class="spec-val hl" style="color: #0df0e3;">${item[3]}</span></div>`;
+        } 
+        else if (isOldFormat) {
+            // Formato antiguo DCS / Bailey
+            address = item[0];
+            tag = item[1];
+            desc = item[2];
+            dataType = 'BOOL';
+        } 
+        else {
+            // Formato normal de Tags de TIA Portal
+            tag = item[0];
+            address = item[1];
+            dataType = item[2];
+            desc = item[3];
+            
+            if (item.length > 4 && item[4] && String(item[4]).trim() !== "") {
+                extraDbInfo += `<div class="spec-item"><span class="spec-label">Data Block</span><span class="spec-val hl" style="color: #0df0e3;">${item[4]}</span></div>`;
+            }
+            if (item.length > 5 && item[5] && String(item[5]).trim() !== "") {
+                extraDbInfo += `<div class="spec-item"><span class="spec-label">Comentario</span><span class="spec-val">${item[5]}</span></div>`;
+            }
+        }
 
         if (!tag || tag.trim() === '') tag = 'Sin TAG';
         if (!address || address.trim() === '') address = 'N/A';
         if (!desc || desc.trim() === '') desc = 'Sin descripción';
         
-        // Limpiamos espacios irregulares
         address = address.replace(/\s+/g, ' ').trim();
-
-        // --- MAGIA PARA EXTRAER EL DATA BLOCK (DB) ---
-        let extraDbInfo = "";
-        // Buscamos en la columna 5 (índice 4)
-        if (!isOldFormat && item.length > 4 && item[4] && String(item[4]).trim() !== "") {
-            extraDbInfo += `<div class="spec-item"><span class="spec-label">Data Block</span><span class="spec-val hl" style="color: #0df0e3;">${item[4]}</span></div>`;
-        }
-        // Buscamos en la columna 6 (índice 5) por si hay comentarios extra
-        if (!isOldFormat && item.length > 5 && item[5] && String(item[5]).trim() !== "") {
-            extraDbInfo += `<div class="spec-item"><span class="spec-label">Comentario</span><span class="spec-val">${item[5]}</span></div>`;
-        }
-        // -----------------------------------------------------------------------------
 
         return `
         <div class="dcs-card type-msdd">
@@ -1258,7 +1273,7 @@
           </div>
           <div class="tag-description">${desc}</div>
           <div class="dcs-specs">
-            <div class="spec-item"><span class="spec-label">Dirección</span><span class="spec-val hl">${address}</span></div>
+            <div class="spec-item"><span class="spec-label">${isHmiAlarm ? 'ID Alarma' : 'Dirección'}</span><span class="spec-val hl">${address}</span></div>
             ${extraDbInfo}
             <div class="spec-item"><span class="spec-label">PLC</span><span class="spec-val">S7-300 / 400</span></div>
             <div class="spec-item"><span class="spec-label">Sistema</span><span class="spec-val hl">Siemens TIA</span></div>
