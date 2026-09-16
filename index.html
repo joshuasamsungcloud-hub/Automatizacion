@@ -1220,7 +1220,7 @@
       }
 
       container.innerHTML = paginated.map(item => {
-        // Ordenamos las variables según el formato detectado
+        // Detectamos si es el formato antiguo o el nuevo del TIA Portal V13
         const isOldFormat = (item[2] !== "BOOL" && item[2] !== "REAL" && item[2] !== "INT" && item[2] !== "WORD" && item[2] !== "DI" && item[2] !== "DO");
         
         let address = isOldFormat ? item[0] : item[1];
@@ -1232,10 +1232,22 @@
         if (!address || address.trim() === '') address = 'N/A';
         if (!desc || desc.trim() === '') desc = 'Sin descripción';
         
-        // Limpiamos los espacios gigantes de TIA Portal para que la tarjeta se vea estética
+        // Limpiamos espacios irregulares
         address = address.replace(/\s+/g, ' ').trim();
 
-       return `
+        // --- MAGIA PARA EXTRAER EL DATA BLOCK (DB) ---
+        let extraDbInfo = "";
+        // Buscamos en la columna 5 (índice 4)
+        if (!isOldFormat && item.length > 4 && item[4] && String(item[4]).trim() !== "") {
+            extraDbInfo += `<div class="spec-item"><span class="spec-label">Data Block</span><span class="spec-val hl" style="color: #0df0e3;">${item[4]}</span></div>`;
+        }
+        // Buscamos en la columna 6 (índice 5) por si hay comentarios extra
+        if (!isOldFormat && item.length > 5 && item[5] && String(item[5]).trim() !== "") {
+            extraDbInfo += `<div class="spec-item"><span class="spec-label">Comentario</span><span class="spec-val">${item[5]}</span></div>`;
+        }
+        // -----------------------------------------------------------------------------
+
+        return `
         <div class="dcs-card type-msdd">
           <div class="card-row-top">
             <div class="tag-title-wrap">
@@ -1246,7 +1258,8 @@
           </div>
           <div class="tag-description">${desc}</div>
           <div class="dcs-specs">
-            <div class="spec-item"><span class="spec-label">Dirección / DB</span><span class="spec-val hl">${address}</span></div>
+            <div class="spec-item"><span class="spec-label">Dirección</span><span class="spec-val hl">${address}</span></div>
+            ${extraDbInfo}
             <div class="spec-item"><span class="spec-label">PLC</span><span class="spec-val">S7-300 / 400</span></div>
             <div class="spec-item"><span class="spec-label">Sistema</span><span class="spec-val hl">Siemens TIA</span></div>
           </div>
