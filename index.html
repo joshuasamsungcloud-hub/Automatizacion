@@ -959,8 +959,7 @@
         resetTimer();
         if (typeof showToast === 'function') showToast("Bóveda Desbloqueada ✓");
       } catch (error) {
-        if (typeof showToast === 'function') showToast("❌ Contraseña incorrecta");
-        else alert("Contraseña incorrecta");
+        alert("Error técnico: " + error.message);
       }
     }
     let vaultUnlocked = false;
